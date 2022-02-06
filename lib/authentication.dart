@@ -5,11 +5,11 @@ import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 
 enum AuthenticationStateEnum {
-  checkEmail,
-  getLoginPassword,
-  getRegistrationPassword,
-  getEmailVerification,
-  allowSignOut,
+  needEmail,
+  needLoginPassword,
+  needRegistrationPassword,
+  needEmailVerification,
+  signedIn,
 }
 
 class AuthenticationChangeNotifier extends ChangeNotifier {
@@ -25,11 +25,11 @@ class AuthenticationChangeNotifier extends ChangeNotifier {
     FirebaseAuth.instance.userChanges().listen((user) {
       _user = user;
       if (user == null) {
-        _authenticationState = AuthenticationStateEnum.checkEmail;
+        _authenticationState = AuthenticationStateEnum.needEmail;
       } else if (user.emailVerified == false) {
-        _authenticationState = AuthenticationStateEnum.getEmailVerification;
+        _authenticationState = AuthenticationStateEnum.needEmailVerification;
       } else {
-        _authenticationState = AuthenticationStateEnum.allowSignOut;
+        _authenticationState = AuthenticationStateEnum.signedIn;
       }
       notifyListeners();
     });
@@ -45,20 +45,23 @@ class AuthenticationChangeNotifier extends ChangeNotifier {
   String? get message => _message;
 
   AuthenticationStateEnum _authenticationState =
-      AuthenticationStateEnum.checkEmail;
+      AuthenticationStateEnum.needEmail;
   AuthenticationStateEnum get authenticationState => _authenticationState;
+
+  bool get isSignedIn =>
+      _authenticationState == AuthenticationStateEnum.signedIn;
 
   Future<void> checkEmail(
     String email,
   ) async {
     try {
       _email = email;
-      _message = "";
+      _message = null;
       var methods =
           await FirebaseAuth.instance.fetchSignInMethodsForEmail(email);
       _authenticationState = methods.contains('password')
-          ? AuthenticationStateEnum.getLoginPassword
-          : AuthenticationStateEnum.getRegistrationPassword;
+          ? AuthenticationStateEnum.needLoginPassword
+          : AuthenticationStateEnum.needRegistrationPassword;
       notifyListeners();
     } on FirebaseAuthException catch (e) {
       _message = e.message;
@@ -97,7 +100,7 @@ class AuthenticationChangeNotifier extends ChangeNotifier {
   Future<void> veryifyEmail() async {
     try {
       await _user?.sendEmailVerification();
-      _authenticationState = AuthenticationStateEnum.checkEmail;
+      _authenticationState = AuthenticationStateEnum.needEmail;
       _message = "Check your email to verify your account.";
       notifyListeners();
     } on FirebaseAuthException catch (e) {
@@ -109,7 +112,7 @@ class AuthenticationChangeNotifier extends ChangeNotifier {
   Future<void> resetPassword() async {
     try {
       await FirebaseAuth.instance.sendPasswordResetEmail(email: _email);
-      _authenticationState = AuthenticationStateEnum.checkEmail;
+      _authenticationState = AuthenticationStateEnum.needEmail;
       _message = "Check your email to reset your password.";
       notifyListeners();
     } on FirebaseAuthException catch (e) {
@@ -119,7 +122,7 @@ class AuthenticationChangeNotifier extends ChangeNotifier {
   }
 
   void startOver() {
-    _authenticationState = AuthenticationStateEnum.checkEmail;
+    _authenticationState = AuthenticationStateEnum.needEmail;
     _message = null;
     notifyListeners();
   }
@@ -136,7 +139,7 @@ class AuthenticationChangeNotifier extends ChangeNotifier {
   Future<void> deleteUser() async {
     try {
       await _user?.delete();
-      _authenticationState = AuthenticationStateEnum.checkEmail;
+      _authenticationState = AuthenticationStateEnum.needEmail;
       _message = "Your account has been deleted.";
       notifyListeners();
     } on FirebaseAuthException catch (e) {
@@ -161,146 +164,152 @@ class _AuthenticationWidgetState extends State<AuthenticationWidget> {
   @override
   Widget build(BuildContext bc) {
     return Consumer<AuthenticationChangeNotifier>(
-        builder: (context, value, child) {
+        builder: (context, authenticationChangeNotifier, child) {
       return Form(
         key: _formKey,
         child: Column(
           children: <Widget>[
-            if (value.authenticationState ==
-                AuthenticationStateEnum.checkEmail) ...[
-              TextFormField(
-                controller: _emailController,
-                decoration: const InputDecoration(
-                  icon: Icon(Icons.person),
-                  hintText: 'Enter your email',
-                  labelText: 'email',
+            if (authenticationChangeNotifier.authenticationState ==
+                AuthenticationStateEnum.needEmail) ...[
+              SizedBox(
+                width: 400,
+                child: TextFormField(
+                  controller: _emailController,
+                  decoration: const InputDecoration(
+                    icon: Icon(Icons.person),
+                    hintText: 'Enter your email',
+                    labelText: 'email',
+                  ),
+                  autofillHints: const [AutofillHints.email],
                 ),
               ),
             ],
-            if (value.authenticationState ==
-                    AuthenticationStateEnum.getRegistrationPassword ||
-                value.authenticationState ==
-                    AuthenticationStateEnum.getLoginPassword) ...[
-              TextFormField(
-                obscureText: true,
-                controller: _passwordController,
-                decoration: InputDecoration(
-                  icon: const Icon(Icons.password),
-                  hintText: (value.authenticationState ==
-                          AuthenticationStateEnum.getLoginPassword)
-                      ? 'Enter your password'
-                      : "Create your password",
-                  labelText: 'password',
+            if (authenticationChangeNotifier.authenticationState ==
+                    AuthenticationStateEnum.needRegistrationPassword ||
+                authenticationChangeNotifier.authenticationState ==
+                    AuthenticationStateEnum.needLoginPassword) ...[
+              SizedBox(
+                width: 400,
+                child: TextFormField(
+                  obscureText: true,
+                  controller: _passwordController,
+                  decoration: InputDecoration(
+                    icon: const Icon(Icons.password),
+                    hintText:
+                        (authenticationChangeNotifier.authenticationState ==
+                                AuthenticationStateEnum.needLoginPassword)
+                            ? 'Enter your password'
+                            : "Create your password",
+                    labelText: 'password',
+                  ),
+                  autofillHints: const [AutofillHints.password],
                 ),
               ),
             ],
-            if (value.message != null) ...[
+            if (authenticationChangeNotifier.message != null) ...[
               Container(height: 8),
-              Text(value.message.toString()),
+              Text(authenticationChangeNotifier.message.toString()),
             ],
-            if (value.authenticationState ==
-                AuthenticationStateEnum.checkEmail) ...[
-              Container(height: 8),
-              ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    value.checkEmail(_emailController.text);
-                  }
-                },
-                child: const Text("Continue Login / Registration"),
-              ),
-            ],
-            if (value.authenticationState ==
-                AuthenticationStateEnum.getLoginPassword) ...[
-              Column(
-                children: [
-                  Container(height: 8),
+            Container(height: 8),
+            Wrap(
+              spacing: 8,
+              children: [
+                if (authenticationChangeNotifier.authenticationState ==
+                    AuthenticationStateEnum.needEmail) ...[
                   ElevatedButton(
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
-                        value.signIn(_passwordController.text);
+                        authenticationChangeNotifier
+                            .checkEmail(_emailController.text);
+                      }
+                    },
+                    child: const Text("Continue Login / Registration"),
+                  ),
+                ],
+                if (authenticationChangeNotifier.authenticationState ==
+                    AuthenticationStateEnum.needLoginPassword) ...[
+                  ElevatedButton(
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        authenticationChangeNotifier
+                            .signIn(_passwordController.text);
                       }
                     },
                     child: const Text("Login"),
                   ),
-                  Container(height: 8),
                   ElevatedButton(
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
-                        value.resetPassword();
+                        authenticationChangeNotifier.resetPassword();
                       }
                     },
                     child: const Text("Send Me Password Reset Email"),
                   ),
                 ],
-              ),
-            ],
-            if (value.authenticationState ==
-                AuthenticationStateEnum.getRegistrationPassword) ...[
-              Container(height: 8),
-              ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    value.register(_passwordController.text);
-                  }
-                },
-                child: const Text("Register My New Account"),
-              ),
-            ],
-            if (value.authenticationState ==
-                AuthenticationStateEnum.getEmailVerification) ...[
-              Container(height: 8),
-              ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    value.veryifyEmail();
-                  }
-                },
-                child: const Text("Send Me Verification Email"),
-              ),
-            ],
-            if (value.authenticationState ==
-                    AuthenticationStateEnum.getLoginPassword ||
-                value.authenticationState ==
-                    AuthenticationStateEnum.getRegistrationPassword) ...[
-              Container(height: 8),
-              ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    value.startOver();
-                  }
-                },
-                child: const Text("Cancel"),
-              ),
-            ],
-            if (value.authenticationState ==
-                    AuthenticationStateEnum.allowSignOut ||
-                value.authenticationState ==
-                    AuthenticationStateEnum.getEmailVerification) ...[
-              Container(height: 8),
-              ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    value.signOut();
-                  }
-                },
-                child: const Text("Signout"),
-              ),
-            ],
-            if (value.authenticationState ==
-                    AuthenticationStateEnum.allowSignOut ||
-                value.authenticationState ==
-                    AuthenticationStateEnum.getEmailVerification) ...[
-              Container(height: 8),
-              ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    value.deleteUser();
-                  }
-                },
-                child: const Text("Delete My Account"),
-              ),
-            ],
+                if (authenticationChangeNotifier.authenticationState ==
+                    AuthenticationStateEnum.needRegistrationPassword) ...[
+                  ElevatedButton(
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        authenticationChangeNotifier
+                            .register(_passwordController.text);
+                      }
+                    },
+                    child: const Text("Register My New Account"),
+                  ),
+                ],
+                if (authenticationChangeNotifier.authenticationState ==
+                    AuthenticationStateEnum.needEmailVerification) ...[
+                  ElevatedButton(
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        authenticationChangeNotifier.veryifyEmail();
+                      }
+                    },
+                    child: const Text("Send Me Verification Email"),
+                  ),
+                ],
+                if (authenticationChangeNotifier.authenticationState ==
+                        AuthenticationStateEnum.needLoginPassword ||
+                    authenticationChangeNotifier.authenticationState ==
+                        AuthenticationStateEnum.needRegistrationPassword) ...[
+                  ElevatedButton(
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        authenticationChangeNotifier.startOver();
+                      }
+                    },
+                    child: const Text("Cancel"),
+                  ),
+                ],
+                if (authenticationChangeNotifier.authenticationState ==
+                        AuthenticationStateEnum.signedIn ||
+                    authenticationChangeNotifier.authenticationState ==
+                        AuthenticationStateEnum.needEmailVerification) ...[
+                  ElevatedButton(
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        authenticationChangeNotifier.signOut();
+                      }
+                    },
+                    child: const Text("Signout"),
+                  ),
+                ],
+                if (authenticationChangeNotifier.authenticationState ==
+                        AuthenticationStateEnum.signedIn ||
+                    authenticationChangeNotifier.authenticationState ==
+                        AuthenticationStateEnum.needEmailVerification) ...[
+                  ElevatedButton(
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        authenticationChangeNotifier.deleteUser();
+                      }
+                    },
+                    child: const Text("Delete My Account"),
+                  ),
+                ],
+              ],
+            ),
           ],
         ),
       );
