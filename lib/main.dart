@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:local_pavoni/firebase.dart';
 import 'package:local_pavoni/world.dart';
 import 'package:provider/provider.dart';
-import 'authentication.dart';
+import 'firebase.dart';
 
 // npm install -g firebase-tools
 // flutter pub add firebase_core
@@ -18,11 +19,11 @@ void main() async {
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(
-        create: (context) => AuthenticationChangeNotifier(),
+        create: (context) => FirebaseChangeNotifier(),
       ),
       ChangeNotifierProvider(
         create: (context) => WorldChangeNotifier(),
-      )
+      ),
     ],
     child: const App(),
   ));
@@ -66,7 +67,7 @@ class SigninBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
-      children: <Widget>[
+      children: [
         const SizedBox(
             width: 200,
             height: 200,
@@ -108,45 +109,86 @@ class MeBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<WorldChangeNotifier>(
-        builder: (context, worldChangeNotifier, child) {
-      return Column(
+    return Consumer2<FirebaseChangeNotifier, WorldChangeNotifier>(
+        builder: (context, firebaseChangeNotifier, worldChangeNotifier, child) {
+      return ListView(
         children: [
-          Row(children: [
-            const Padding(
-                padding: EdgeInsets.all(12.0), child: Icon(Icons.language)),
-            DropdownButton(
-              value: worldChangeNotifier.selectedCountry,
-              items: worldChangeNotifier.countries.entries
-                  .map<DropdownMenuItem<String>>((var country) {
-                return DropdownMenuItem<String>(
-                    value: country.key, child: Text(country.key));
-              }).toList(),
-              onChanged: (String? newValue) {
-                worldChangeNotifier.selectedCountry = newValue!;
-              },
-            )
-          ]),
-          Row(children: [
-            const Padding(
-                padding: EdgeInsets.all(12.0),
-                child: Icon(Icons.person_pin_circle)),
-            DropdownButton(
-              value: worldChangeNotifier.selectedState,
-              items: worldChangeNotifier
-                  .countries[worldChangeNotifier.selectedCountry]
-                  ?.map<DropdownMenuItem<String>>((var state) {
-                return DropdownMenuItem<String>(
-                    value: state, child: Text(state));
-              }).toList(),
-              onChanged: (String? newValue) {
-                worldChangeNotifier.selectedState = newValue!;
-              },
-            )
-          ]),
+          Container(height: 16),
+          GestureDetector(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.language),
+                Container(width: 8),
+                Text(firebaseChangeNotifier.country,
+                    textAlign: TextAlign.center),
+                Container(width: 8),
+                const Icon(Icons.arrow_downward),
+              ],
+            ),
+            onTap: () async {
+              var country = await _countryOrStateDialog(
+                  context, worldChangeNotifier.countries());
+              if (country != null) {
+                firebaseChangeNotifier.country = country;
+                firebaseChangeNotifier.state =
+                    worldChangeNotifier.states(country)[0];
+              }
+            },
+          ),
+          Container(height: 16),
+          GestureDetector(
+            child: Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.location_pin),
+                  Container(width: 8),
+                  Text(firebaseChangeNotifier.state,
+                      textAlign: TextAlign.center),
+                  Container(width: 8),
+                  const Icon(Icons.arrow_downward),
+                ],
+              ),
+            ),
+            onTap: () async {
+              var state = await _countryOrStateDialog(context,
+                  worldChangeNotifier.states(firebaseChangeNotifier.country));
+              if (state != null) {
+                firebaseChangeNotifier.state = state;
+              }
+            },
+          ),
         ],
       );
     });
+  }
+
+  Future<String?> _countryOrStateDialog(
+      BuildContext context, List<String> options) async {
+    String? retVal;
+    await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return SimpleDialog(children: [
+            SizedBox(
+                width: 200,
+                height: 400,
+                child: ListView.builder(
+                    itemCount: options.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        title: Text(options[index]),
+                        onTap: () {
+                          retVal = options[index];
+                          Navigator.pop(context);
+                        },
+                      );
+                    })),
+          ]);
+        });
+    return retVal;
   }
 }
 
@@ -171,11 +213,11 @@ class HomeBottomNavigationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<AuthenticationChangeNotifier>(
-        builder: (context, authenticationChangeNotifier, child) {
+    return Consumer<FirebaseChangeNotifier>(
+        builder: (context, firebaseChangeNotifier, child) {
       return BottomNavigationBar(
         items: [
-          if (authenticationChangeNotifier.isSignedIn) ...[
+          if (firebaseChangeNotifier.isSignedIn) ...[
             const BottomNavigationBarItem(
                 icon: Icon(Icons.logout), label: "Signout")
           ] else ...[

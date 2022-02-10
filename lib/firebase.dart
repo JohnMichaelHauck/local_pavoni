@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:developer';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -12,8 +15,10 @@ enum AuthenticationStateEnum {
   signedIn,
 }
 
-class AuthenticationChangeNotifier extends ChangeNotifier {
-  AuthenticationChangeNotifier() {
+StreamSubscription? _listener;
+
+class FirebaseChangeNotifier extends ChangeNotifier {
+  FirebaseChangeNotifier() {
     init();
   }
 
@@ -24,19 +29,50 @@ class AuthenticationChangeNotifier extends ChangeNotifier {
 
     FirebaseAuth.instance.userChanges().listen((user) {
       _user = user;
+      _userId = user?.uid ?? "";
+
       if (user == null) {
         _authenticationState = AuthenticationStateEnum.needEmail;
+        if (_listener != null) {
+          _listener?.cancel();
+          _listener = null;
+        }
       } else if (user.emailVerified == false) {
         _authenticationState = AuthenticationStateEnum.needEmailVerification;
+        if (_listener != null) {
+          _listener?.cancel();
+          _listener = null;
+        }
       } else {
         _authenticationState = AuthenticationStateEnum.signedIn;
+        _listener = FirebaseFirestore.instance
+            .collection('users')
+            .doc(_userId)
+            .snapshots()
+            .listen((event) {
+          log("heard from firestore");
+          var data = event.data();
+          if (data != null) {
+            if (data.containsKey("country")) {
+              _country = data["country"];
+            }
+            if (data.containsKey("state")) {
+              _state = data["state"];
+            }
+            notifyListeners();
+          }
+        });
       }
       notifyListeners();
     });
   }
 
+//request.auth != null && request.auth.uid == userId;
+
   User? _user;
   User? get user => _user;
+
+  String _userId = "";
 
   String _email = "";
   String get email => _email;
@@ -147,6 +183,32 @@ class AuthenticationChangeNotifier extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  String _country = "";
+  String get country => _country;
+  set country(String country) {
+    if (isSignedIn) {
+      log("writing country to firestore");
+      FirebaseFirestore.instance.collection('users').doc(_userId).update(
+        <String, dynamic>{
+          'country': country,
+        },
+      );
+    }
+  }
+
+  String _state = "";
+  String get state => _state;
+  set state(String state) {
+    if (isSignedIn) {
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(_userId)
+          .update(<String, dynamic>{
+        'state': state,
+      });
+    }
+  }
 }
 
 class AuthenticationWidget extends StatefulWidget {
@@ -163,7 +225,7 @@ class _AuthenticationWidgetState extends State<AuthenticationWidget> {
 
   @override
   Widget build(BuildContext bc) {
-    return Consumer<AuthenticationChangeNotifier>(
+    return Consumer<FirebaseChangeNotifier>(
         builder: (context, authenticationChangeNotifier, child) {
       return Form(
         key: _formKey,

@@ -7,38 +7,26 @@ class WorldChangeNotifier extends ChangeNotifier {
     init();
   }
 
-  bool loaded = false;
-  var countries = <String, List<String>>{};
+  var world = <String, List<String>>{};
 
-  String _selectedCountry = "";
-  String get selectedCountry => _selectedCountry;
-  set selectedCountry(String selectedCountry) {
-    _selectedCountry = selectedCountry;
-    _selectedState = countries[selectedCountry]!.first;
-    notifyListeners();
+  List<String> countries() {
+    return world.keys.toList();
   }
 
-  String _selectedState = "";
-  String get selectedState => _selectedState;
-  set selectedState(String selectedState) {
-    _selectedState = selectedState;
-    notifyListeners();
+  List<String> states(String country) {
+    return world.containsKey(country) ? world[country] ?? [country] : [country];
   }
 
   Future<void> init() async {
     var worldJson = await rootBundle.loadString("assets/world.json");
     var worldDecoded = jsonDecode(worldJson);
     for (dynamic country in worldDecoded) {
-      List<String> states = [];
+      var states = <String>[];
       for (dynamic state in country["states"]) {
         states.add(state["name"]);
       }
-      if (states.isEmpty) {
-        states.add(country["name"]);
-      }
-      countries[country["name"]] = states;
+      world[country["name"]] = states;
     }
-    selectedCountry = countries.keys.first;
-    loaded = true;
+    notifyListeners();
   }
 }
