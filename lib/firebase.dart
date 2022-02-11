@@ -188,12 +188,12 @@ class FirebaseChangeNotifier extends ChangeNotifier {
   String get country => _country;
   set country(String country) {
     if (isSignedIn) {
-      log("writing country to firestore");
-      FirebaseFirestore.instance.collection('users').doc(_userId).update(
-        <String, dynamic>{
-          'country': country,
-        },
-      );
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(_userId)
+          .set(<String, dynamic>{
+        'country': country,
+      }, SetOptions(merge: true));
     }
   }
 
@@ -204,9 +204,9 @@ class FirebaseChangeNotifier extends ChangeNotifier {
       FirebaseFirestore.instance
           .collection('users')
           .doc(_userId)
-          .update(<String, dynamic>{
+          .set(<String, dynamic>{
         'state': state,
-      });
+      }, SetOptions(merge: true));
     }
   }
 }
@@ -222,6 +222,13 @@ class _AuthenticationWidgetState extends State<AuthenticationWidget> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext bc) {
@@ -243,6 +250,8 @@ class _AuthenticationWidgetState extends State<AuthenticationWidget> {
                     labelText: 'email',
                   ),
                   autofillHints: const [AutofillHints.email],
+                  onFieldSubmitted: (value) => authenticationChangeNotifier
+                      .checkEmail(_emailController.text),
                 ),
               ),
             ],
@@ -265,6 +274,16 @@ class _AuthenticationWidgetState extends State<AuthenticationWidget> {
                     labelText: 'password',
                   ),
                   autofillHints: const [AutofillHints.password],
+                  onFieldSubmitted: (value) {
+                    if (authenticationChangeNotifier.authenticationState ==
+                        AuthenticationStateEnum.needRegistrationPassword) {
+                      authenticationChangeNotifier
+                          .register(_passwordController.text);
+                    } else {
+                      authenticationChangeNotifier
+                          .signIn(_passwordController.text);
+                    }
+                  },
                 ),
               ),
             ],
@@ -299,7 +318,7 @@ class _AuthenticationWidgetState extends State<AuthenticationWidget> {
                     },
                     child: const Text("Login"),
                   ),
-                  ElevatedButton(
+                  OutlinedButton(
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
                         authenticationChangeNotifier.resetPassword();
@@ -335,7 +354,7 @@ class _AuthenticationWidgetState extends State<AuthenticationWidget> {
                         AuthenticationStateEnum.needLoginPassword ||
                     authenticationChangeNotifier.authenticationState ==
                         AuthenticationStateEnum.needRegistrationPassword) ...[
-                  ElevatedButton(
+                  OutlinedButton(
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
                         authenticationChangeNotifier.startOver();
@@ -361,7 +380,7 @@ class _AuthenticationWidgetState extends State<AuthenticationWidget> {
                         AuthenticationStateEnum.signedIn ||
                     authenticationChangeNotifier.authenticationState ==
                         AuthenticationStateEnum.needEmailVerification) ...[
-                  ElevatedButton(
+                  OutlinedButton(
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
                         authenticationChangeNotifier.deleteUser();

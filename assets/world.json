@@ -885,28 +885,28 @@
       },
       {
         "name": "Saint George Parish",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       },
       {
         "name": "Saint John Parish",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       },
       {
         "name": "Saint Mary Parish",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       },
       {
         "name": "Saint Paul Parish",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       },
       {
         "name": "Saint Peter Parish",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       },
       {
         "name": "Saint Philip Parish",
@@ -2204,8 +2204,8 @@
       },
       {
         "name": "Saint Andrew",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       },
       {
         "name": "Saint George",
@@ -2338,8 +2338,8 @@
       },
       {
         "name": "Limburg",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       },
       {
         "name": "Luxembourg",
@@ -2658,8 +2658,8 @@
       },
       {
         "name": "La Paz Department",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       },
       {
         "name": "Oruro Department",
@@ -2773,8 +2773,8 @@
     "states": [
       {
         "name": "Central District",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       },
       {
         "name": "Ghanzi District",
@@ -2818,8 +2818,8 @@
       },
       {
         "name": "Southern District",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       }
     ]
   },
@@ -3198,8 +3198,8 @@
       },
       {
         "name": "Centre",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       },
       {
         "name": "Centre-Est Region",
@@ -3674,8 +3674,8 @@
       },
       {
         "name": "Centre",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       },
       {
         "name": "East",
@@ -4835,8 +4835,8 @@
       },
       {
         "name": "Savanes Region",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       },
       {
         "name": "Sud-Bandama",
@@ -5772,23 +5772,23 @@
     "states": [
       {
         "name": "Saint Andrew Parish",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       },
       {
         "name": "Saint David Parish",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       },
       {
         "name": "Saint George Parish",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       },
       {
         "name": "Saint John Parish",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       },
       {
         "name": "Saint Joseph Parish",
@@ -5802,13 +5802,13 @@
       },
       {
         "name": "Saint Mark Parish",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       },
       {
         "name": "Saint Patrick Parish",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       },
       {
         "name": "Saint Paul Parish",
@@ -6352,8 +6352,8 @@
       },
       {
         "name": "La Paz Department",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       },
       {
         "name": "La Unión Department",
@@ -7859,8 +7859,8 @@
       },
       {
         "name": "Argolis Regional Unit",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       },
       {
         "name": "Attica Region",
@@ -7894,8 +7894,8 @@
       },
       {
         "name": "Corinthia Regional Unit",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       },
       {
         "name": "Crete Region",
@@ -8052,18 +8052,18 @@
       },
       {
         "name": "Saint Andrew Parish",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       },
       {
         "name": "Saint David Parish",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       },
       {
         "name": "Saint George Parish",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       },
       {
         "name": "Saint John Parish",
@@ -8077,8 +8077,8 @@
       },
       {
         "name": "Saint Patrick Parish",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       }
     ]
   },
@@ -8451,8 +8451,8 @@
       },
       {
         "name": "Leste Province",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       },
       {
         "name": "Norte Province",
@@ -9019,8 +9019,8 @@
     "states": [
       {
         "name": "Eastern Region",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       },
       {
         "name": "Northeastern Region",
@@ -9039,13 +9039,13 @@
       },
       {
         "name": "Southern Region",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       },
       {
         "name": "Western Region",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       },
       {
         "name": "Westfjords",
@@ -9196,8 +9196,8 @@
       },
       {
         "name": "Punjab",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       },
       {
         "name": "Rajasthan",
@@ -11474,8 +11474,8 @@
       },
       {
         "name": "Xaisomboun",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       },
       {
         "name": "Xaisomboun Province",
@@ -13367,8 +13367,8 @@
       },
       {
         "name": "Central Region",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       },
       {
         "name": "Chikwawa District",
@@ -13457,8 +13457,8 @@
       },
       {
         "name": "Northern Region",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       },
       {
         "name": "Nsanje District",
@@ -13616,8 +13616,8 @@
       },
       {
         "name": "Central Province",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       },
       {
         "name": "Dhaalu Atoll",
@@ -13686,8 +13686,8 @@
       },
       {
         "name": "North Central Province",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       },
       {
         "name": "North Province",
@@ -15739,8 +15739,8 @@
       },
       {
         "name": "Central Region",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       },
       {
         "name": "Dhaulagiri Zone",
@@ -15819,8 +15819,8 @@
       },
       {
         "name": "Western Region",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       }
     ]
   },
@@ -16818,8 +16818,8 @@
       },
       {
         "name": "Central Province",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       },
       {
         "name": "Chimbu Province",
@@ -16913,8 +16913,8 @@
       },
       {
         "name": "Western Province",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       }
     ]
   },
@@ -17017,8 +17017,8 @@
     "states": [
       {
         "name": "Amazonas",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       },
       {
         "name": "Áncash",
@@ -18544,8 +18544,8 @@
     "states": [
       {
         "name": "Eastern Province",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       },
       {
         "name": "Kigali district",
@@ -18554,18 +18554,18 @@
       },
       {
         "name": "Northern Province",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       },
       {
         "name": "Southern Province",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       },
       {
         "name": "Western Province",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       }
     ]
   },
@@ -19330,18 +19330,18 @@
     "states": [
       {
         "name": "Eastern Province",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       },
       {
         "name": "Northern Province",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       },
       {
         "name": "Southern Province",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       },
       {
         "name": "Western Area",
@@ -20499,8 +20499,8 @@
     "states": [
       {
         "name": "Central Province",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       },
       {
         "name": "Choiseul Province",
@@ -20544,8 +20544,8 @@
       },
       {
         "name": "Western Province",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       }
     ]
   },
@@ -21017,8 +21017,8 @@
       },
       {
         "name": "Central Province",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       },
       {
         "name": "Colombo District",
@@ -21027,8 +21027,8 @@
       },
       {
         "name": "Eastern Province",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       },
       {
         "name": "Galle District",
@@ -21107,8 +21107,8 @@
       },
       {
         "name": "Northern Province",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       },
       {
         "name": "Nuwara Eliya District",
@@ -21137,8 +21137,8 @@
       },
       {
         "name": "Southern Province",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       },
       {
         "name": "Trincomalee District",
@@ -21157,8 +21157,8 @@
       },
       {
         "name": "Western Province",
-        "latitude": null,
-        "longitude": null
+        "latitude": "0.0",
+        "longitude": "0.0"
       }
     ]
   },
