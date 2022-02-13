@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:local_pavoni/firebase.dart';
-import 'package:local_pavoni/world.dart';
+import 'package:local_pavoni/firebase_cnp.dart';
+import 'package:local_pavoni/world_cnp.dart';
 import 'package:provider/provider.dart';
 import 'main.dart';
+import 'dart:developer';
 
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 // https://medium.com/flutter-community/flutter-web-and-google-maps-f2489b483a1f
@@ -35,6 +36,10 @@ class MapBody extends StatelessWidget {
             firebaseChangeNotifier.country, firebaseChangeNotifier.state);
         var latlng = LatLng(state.latitude, state.longitude);
         var cameraPosition = CameraPosition(target: latlng, zoom: 6);
+        log("Building Map " +
+            firebaseChangeNotifier.country +
+            " " +
+            firebaseChangeNotifier.state);
         return GoogleMap(
           mapType: MapType.normal,
           initialCameraPosition: cameraPosition,

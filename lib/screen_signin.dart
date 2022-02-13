@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'firebase.dart';
+import 'firebase_authentication_widget.dart';
 import 'main.dart';
 
 class SigninScreen extends StatelessWidget {
@@ -39,7 +39,7 @@ class SigninBody extends StatelessWidget {
             style: Theme.of(context).textTheme.headline5),
         Padding(
             padding: const EdgeInsets.all(12.0),
-            child: AuthenticationWidget(key: key)),
+            child: FirebaseAuthenticationWidget(key: key)),
       ],
     );
   }

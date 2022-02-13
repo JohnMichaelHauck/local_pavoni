@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -8,7 +7,7 @@ class WorldChangeNotifier extends ChangeNotifier {
     init();
   }
 
-  var world = <String, Country>{};
+  var world = <String, WorldCountry>{};
 
   List<String> countries() {
     return world.keys.toList();
@@ -22,7 +21,7 @@ class WorldChangeNotifier extends ChangeNotifier {
     return [countryName];
   }
 
-  State state(String countryName, String stateName) {
+  WorldState state(String countryName, String stateName) {
     var country = world[countryName];
     if (country != null && country.states.isNotEmpty) {
       var state = country.states[stateName];
@@ -30,20 +29,20 @@ class WorldChangeNotifier extends ChangeNotifier {
         return state;
       }
     }
-    return State(37.42796133580664, -122.085749655962);
+    return WorldState(37.42796133580664, -122.085749655962);
   }
 
   Future<void> init() async {
     var worldJson = await rootBundle.loadString("assets/world.json");
     dynamic dynamicWorld = jsonDecode(worldJson);
     for (dynamic dynamicCountry in dynamicWorld) {
-      var states = <String, State>{};
+      var states = <String, WorldState>{};
       for (dynamic dynamicState in dynamicCountry["states"]) {
-        states[dynamicState["name"]] = State(
+        states[dynamicState["name"]] = WorldState(
             double.parse(dynamicState["latitude"]),
             double.parse(dynamicState["longitude"]));
       }
-      world[dynamicCountry["name"]] = Country(
+      world[dynamicCountry["name"]] = WorldCountry(
           double.parse(dynamicCountry["latitude"]),
           double.parse(dynamicCountry["longitude"]),
           states);
@@ -52,15 +51,15 @@ class WorldChangeNotifier extends ChangeNotifier {
   }
 }
 
-class Country {
+class WorldCountry {
   final double latitude;
   final double longitude;
-  final Map<String, State> states;
-  Country(this.latitude, this.longitude, this.states);
+  final Map<String, WorldState> states;
+  WorldCountry(this.latitude, this.longitude, this.states);
 }
 
-class State {
+class WorldState {
   final double latitude;
   final double longitude;
-  State(this.latitude, this.longitude);
+  WorldState(this.latitude, this.longitude);
 }

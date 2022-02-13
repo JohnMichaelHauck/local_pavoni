@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'world.dart';
-import 'firebase.dart';
-import 'signin_screen.dart';
-import 'me_screen.dart';
-import 'map_screen.dart';
+import 'screen_cnp.dart';
+import 'world_cnp.dart';
+import 'firebase_cnp.dart';
+import 'screen_signin.dart';
+import 'screen_me.dart';
+import 'screen_map.dart';
 
 // npm install -g firebase-tools
 // flutter pub add firebase_core
@@ -15,13 +16,17 @@ import 'map_screen.dart';
 // npm install -g firebase-tools
 // firebase login
 // firebase init hosting
-// firebase init
+// firebase init (Firestore, Hosting, Functions)
 // flutter build web
+// firebase.json->"hosting": { "public": "build/web" ...
 // firebase deploy
 
 void main() async {
   runApp(MultiProvider(
     providers: [
+      ChangeNotifierProvider(
+        create: (context) => ScreenChangeNotifier(),
+      ),
       ChangeNotifierProvider(
         create: (context) => FirebaseChangeNotifier(),
       ),
@@ -39,13 +44,19 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Local Pavoni',
-      routes: {
-        "/": (context) => const SigninScreen(),
-        "/me": (context) => const MeScreen(),
-        "/map": (context) => const MapScreen(),
-      },
-    );
+        title: 'Local Pavoni',
+        home: Consumer<ScreenChangeNotifier>(
+          builder: (context, screenChangeNotifier, child) {
+            switch (screenChangeNotifier.screen) {
+              case ScreenEnum.screenSignin:
+                return const SigninScreen();
+              case ScreenEnum.screenMe:
+                return const MeScreen();
+              case ScreenEnum.screenMap:
+                return const MapScreen();
+            }
+          },
+        ));
   }
 }
 
@@ -56,25 +67,29 @@ class HomeBottomNavigationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<FirebaseChangeNotifier>(
-        builder: (context, firebaseChangeNotifier, child) {
+    return Consumer<ScreenChangeNotifier>(
+        builder: ((context, screenChangeNotifier, child) {
       return BottomNavigationBar(
-        items: [
-          if (firebaseChangeNotifier.isSignedIn) ...[
-            const BottomNavigationBarItem(
-                icon: Icon(Icons.logout), label: "Signout")
-          ] else ...[
-            const BottomNavigationBarItem(
-                icon: Icon(Icons.login), label: "Signin")
-          ],
-          const BottomNavigationBarItem(
-              icon: Icon(Icons.info), label: "About me"),
-          const BottomNavigationBarItem(icon: Icon(Icons.map), label: "Map"),
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.login), label: "Signin/out"),
+          BottomNavigationBarItem(icon: Icon(Icons.info), label: "About me"),
+          BottomNavigationBarItem(icon: Icon(Icons.map), label: "Map"),
         ],
-        onTap: (i) => {
-          Navigator.pushReplacementNamed(context, ["/", "/me", "/map"][i])
+        onTap: (i) {
+          switch (i) {
+            case 0:
+              screenChangeNotifier.screen = ScreenEnum.screenSignin;
+              break;
+            case 1:
+              screenChangeNotifier.screen = ScreenEnum.screenMe;
+              break;
+            case 2:
+              screenChangeNotifier.screen = ScreenEnum.screenMap;
+              break;
+            default:
+          }
         },
       );
-    });
+    }));
   }
 }
