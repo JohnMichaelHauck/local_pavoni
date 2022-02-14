@@ -9,6 +9,24 @@ class WorldChangeNotifier extends ChangeNotifier {
 
   var world = <String, WorldCountry>{};
 
+  Future<void> init() async {
+    var worldJson = await rootBundle.loadString("assets/world.json");
+    dynamic dynamicWorld = jsonDecode(worldJson);
+    for (dynamic dynamicCountry in dynamicWorld) {
+      var states = <String, WorldState>{};
+      for (dynamic dynamicState in dynamicCountry["states"]) {
+        states[dynamicState["name"]] = WorldState(
+            double.parse(dynamicState["latitude"]),
+            double.parse(dynamicState["longitude"]));
+      }
+      world[dynamicCountry["name"]] = WorldCountry(
+          double.parse(dynamicCountry["latitude"]),
+          double.parse(dynamicCountry["longitude"]),
+          states);
+    }
+    notifyListeners();
+  }
+
   List<String> countries() {
     return world.keys.toList();
   }
@@ -32,6 +50,25 @@ class WorldChangeNotifier extends ChangeNotifier {
     return WorldState(37.42796133580664, -122.085749655962);
   }
 
+  Iterable<CensusCountry> worldCensus() sync* {
+    for (var country in world.entries) {
+      if (country.value.residents > 0) {
+        yield CensusCountry(country.key, country.value.residents);
+      }
+    }
+  }
+
+  Iterable<CensusState> countryCensus(String countryName) sync* {
+    var country = world[countryName];
+    if (country != null) {
+      for (var state in country.states.entries) {
+        if (state.value.residents > 0) {
+          yield CensusState(state.key, state.value.residents);
+        }
+      }
+    }
+  }
+
   void beginAddingResidents() {
     for (var country in world.values) {
       country.beginAddingResidents();
@@ -52,24 +89,18 @@ class WorldChangeNotifier extends ChangeNotifier {
   void endAddingResidents() {
     notifyListeners();
   }
+}
 
-  Future<void> init() async {
-    var worldJson = await rootBundle.loadString("assets/world.json");
-    dynamic dynamicWorld = jsonDecode(worldJson);
-    for (dynamic dynamicCountry in dynamicWorld) {
-      var states = <String, WorldState>{};
-      for (dynamic dynamicState in dynamicCountry["states"]) {
-        states[dynamicState["name"]] = WorldState(
-            double.parse(dynamicState["latitude"]),
-            double.parse(dynamicState["longitude"]));
-      }
-      world[dynamicCountry["name"]] = WorldCountry(
-          double.parse(dynamicCountry["latitude"]),
-          double.parse(dynamicCountry["longitude"]),
-          states);
-    }
-    notifyListeners();
-  }
+class CensusCountry {
+  final String name;
+  final int census;
+  CensusCountry(this.name, this.census);
+}
+
+class CensusState {
+  final String name;
+  final int census;
+  CensusState(this.name, this.census);
 }
 
 class WorldCountry {

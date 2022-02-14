@@ -10,7 +10,7 @@ class MeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('About Me'),
+        title: const Text('Me'),
       ),
       body: MeBody(key: key),
       bottomNavigationBar: HomeBottomNavigationBar(key: key),

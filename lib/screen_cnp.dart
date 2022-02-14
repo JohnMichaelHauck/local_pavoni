@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 enum ScreenEnum {
   screenSignin,
   screenMe,
+  screenCensus,
   screenMap,
 }
 

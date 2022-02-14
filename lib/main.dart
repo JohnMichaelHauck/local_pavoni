@@ -2,6 +2,7 @@ import 'dart:js';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'screen_census.dart';
 import 'screen_cnp.dart';
 import 'world_cnp.dart';
 import 'firebase_cnp.dart';
@@ -61,6 +62,8 @@ class App extends StatelessWidget {
                 return const SigninScreen();
               case ScreenEnum.screenMe:
                 return const MeScreen();
+              case ScreenEnum.screenCensus:
+                return const CensusScreen();
               case ScreenEnum.screenMap:
                 return const MapScreen();
             }
@@ -79,9 +82,12 @@ class HomeBottomNavigationBar extends StatelessWidget {
     return Consumer<ScreenChangeNotifier>(
         builder: ((context, screenChangeNotifier, child) {
       return BottomNavigationBar(
+        type: BottomNavigationBarType
+            .fixed, // annoyingly needed for more than three items
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.login), label: "Signin/out"),
-          BottomNavigationBarItem(icon: Icon(Icons.info), label: "About me"),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Me"),
+          BottomNavigationBarItem(icon: Icon(Icons.people), label: "Census"),
           BottomNavigationBarItem(icon: Icon(Icons.map), label: "Map"),
         ],
         onTap: (i) {
@@ -93,6 +99,9 @@ class HomeBottomNavigationBar extends StatelessWidget {
               screenChangeNotifier.screen = ScreenEnum.screenMe;
               break;
             case 2:
+              screenChangeNotifier.screen = ScreenEnum.screenCensus;
+              break;
+            case 3:
               screenChangeNotifier.screen = ScreenEnum.screenMap;
               break;
             default:
