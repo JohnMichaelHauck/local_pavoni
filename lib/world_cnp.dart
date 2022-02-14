@@ -32,6 +32,27 @@ class WorldChangeNotifier extends ChangeNotifier {
     return WorldState(37.42796133580664, -122.085749655962);
   }
 
+  void beginAddingResidents() {
+    for (var country in world.values) {
+      country.beginAddingResidents();
+    }
+  }
+
+  void addResident(String countryName, String stateName) {
+    var country = world[countryName];
+    if (country != null && country.states.isNotEmpty) {
+      country.residents++;
+      var state = country.states[stateName];
+      if (state != null) {
+        state.residents++;
+      }
+    }
+  }
+
+  void endAddingResidents() {
+    notifyListeners();
+  }
+
   Future<void> init() async {
     var worldJson = await rootBundle.loadString("assets/world.json");
     dynamic dynamicWorld = jsonDecode(worldJson);
@@ -55,11 +76,22 @@ class WorldCountry {
   final double latitude;
   final double longitude;
   final Map<String, WorldState> states;
+  int residents = 0;
   WorldCountry(this.latitude, this.longitude, this.states);
+  void beginAddingResidents() {
+    residents = 0;
+    for (var state in states.values) {
+      state.beginAddingResidents();
+    }
+  }
 }
 
 class WorldState {
   final double latitude;
   final double longitude;
+  int residents = 0;
   WorldState(this.latitude, this.longitude);
+  void beginAddingResidents() {
+    residents = 0;
+  }
 }

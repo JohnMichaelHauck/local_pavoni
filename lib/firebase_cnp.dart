@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'world_cnp.dart';
 import 'firebase_options.dart';
 
 enum AuthenticationStateEnum {
@@ -33,7 +34,10 @@ class FirebaseChangeNotifier extends ChangeNotifier {
   bool get isSignedIn =>
       _authenticationState == AuthenticationStateEnum.signedIn;
 
-  StreamSubscription? _usersListener;
+  StreamSubscription<DocumentSnapshot>? _userSubscription;
+  StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _usersSubscription;
+
+  WorldChangeNotifier? worldChangeNotifier;
 
   FirebaseChangeNotifier() {
     init();
@@ -50,19 +54,16 @@ class FirebaseChangeNotifier extends ChangeNotifier {
 
       if (user == null) {
         _authenticationState = AuthenticationStateEnum.needEmail;
-        if (_usersListener != null) {
-          _usersListener?.cancel();
-          _usersListener = null;
-        }
       } else if (user.emailVerified == false) {
         _authenticationState = AuthenticationStateEnum.needEmailVerification;
-        if (_usersListener != null) {
-          _usersListener?.cancel();
-          _usersListener = null;
-        }
       } else {
         _authenticationState = AuthenticationStateEnum.signedIn;
-        _usersListener = FirebaseFirestore.instance
+      }
+
+      notifyListeners();
+
+      if (user != null) {
+        _userSubscription ??= FirebaseFirestore.instance
             .collection('users')
             .doc(_userId)
             .snapshots()
@@ -75,12 +76,31 @@ class FirebaseChangeNotifier extends ChangeNotifier {
             if (data.containsKey("state")) {
               _state = data["state"];
             }
-            log("state changed to " + _state);
             notifyListeners();
           }
         });
+        _usersSubscription ??= FirebaseFirestore.instance
+            .collection('users')
+            .snapshots()
+            .listen((users) {
+          if (worldChangeNotifier != null) {
+            worldChangeNotifier?.beginAddingResidents();
+            for (final document in users.docs) {
+              var data = document.data();
+              if (data.containsKey("country") && data.containsKey("state")) {
+                worldChangeNotifier?.addResident(
+                    data["country"], data["state"]);
+              }
+            }
+            worldChangeNotifier?.endAddingResidents();
+          }
+        });
+      } else {
+        _userSubscription?.cancel();
+        _usersSubscription?.cancel();
+        _userSubscription = null;
+        _usersSubscription = null;
       }
-      notifyListeners();
     });
   }
 
@@ -181,29 +201,21 @@ class FirebaseChangeNotifier extends ChangeNotifier {
     }
   }
 
-  String _country = "";
-  String get country => _country;
-  set country(String country) {
+  void setCountryState(String country, String state) {
     if (isSignedIn) {
       FirebaseFirestore.instance
           .collection('users')
           .doc(_userId)
           .set(<String, dynamic>{
         'country': country,
-      }, SetOptions(merge: true));
-    }
-  }
-
-  String _state = "";
-  String get state => _state;
-  set state(String state) {
-    if (isSignedIn) {
-      FirebaseFirestore.instance
-          .collection('users')
-          .doc(_userId)
-          .set(<String, dynamic>{
         'state': state,
       }, SetOptions(merge: true));
     }
   }
+
+  String _country = "";
+  String get country => _country;
+
+  String _state = "";
+  String get state => _state;
 }

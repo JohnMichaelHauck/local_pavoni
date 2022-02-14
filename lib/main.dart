@@ -1,3 +1,5 @@
+import 'dart:js';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'screen_cnp.dart';
@@ -28,10 +30,17 @@ void main() async {
         create: (context) => ScreenChangeNotifier(),
       ),
       ChangeNotifierProvider(
-        create: (context) => FirebaseChangeNotifier(),
-      ),
-      ChangeNotifierProvider(
         create: (context) => WorldChangeNotifier(),
+      ),
+      ChangeNotifierProxyProvider<WorldChangeNotifier, FirebaseChangeNotifier>(
+        create: (context) => FirebaseChangeNotifier(),
+        update: (context, worldChangeNotifier, firebaseChangeNotifier) {
+          if (firebaseChangeNotifier == null) {
+            throw ArgumentError.notNull('firebaseChangeNotifier');
+          }
+          firebaseChangeNotifier.worldChangeNotifier = worldChangeNotifier;
+          return firebaseChangeNotifier;
+        },
       ),
     ],
     child: const App(),

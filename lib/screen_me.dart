@@ -48,9 +48,8 @@ class MeBody extends StatelessWidget {
                     var country = await _countryOrStateDialog(
                         context, worldChangeNotifier.countries());
                     if (country != null) {
-                      firebaseChangeNotifier.country = country;
-                      firebaseChangeNotifier.state =
-                          worldChangeNotifier.states(country)[0];
+                      firebaseChangeNotifier.setCountryState(
+                          country, worldChangeNotifier.states(country)[0]);
                     }
                   },
                 ),
@@ -77,7 +76,8 @@ class MeBody extends StatelessWidget {
                         worldChangeNotifier
                             .states(firebaseChangeNotifier.country));
                     if (state != null) {
-                      firebaseChangeNotifier.state = state;
+                      firebaseChangeNotifier.setCountryState(
+                          firebaseChangeNotifier.country, state);
                     }
                   },
                 ),
