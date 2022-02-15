@@ -35,7 +35,8 @@ class FirebaseChangeNotifier extends ChangeNotifier {
       _authenticationState == AuthenticationStateEnum.signedIn;
 
   StreamSubscription<DocumentSnapshot>? _userSubscription;
-  StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _usersSubscription;
+  StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _censusSubscription;
+  List<CensusCountry> censusCountries = [];
 
   WorldChangeNotifier? worldChangeNotifier;
 
@@ -86,27 +87,31 @@ class FirebaseChangeNotifier extends ChangeNotifier {
             notifyListeners();
           }
         });
-        _usersSubscription ??= FirebaseFirestore.instance
-            .collection('users')
+        _censusSubscription ??= FirebaseFirestore.instance
+            .collection('census')
+            .orderBy(FieldPath.documentId)
             .snapshots()
-            .listen((users) {
-          if (worldChangeNotifier != null) {
-            worldChangeNotifier?.beginAddingResidents();
-            for (final document in users.docs) {
-              var data = document.data();
-              if (data.containsKey("country") && data.containsKey("state")) {
-                worldChangeNotifier?.addResident(
-                    data["country"], data["state"]);
-              }
+            .listen((census) {
+          censusCountries.clear();
+          for (final country in census.docs) {
+            var censusStates = <CensusState>[];
+            int censusCountry = 0;
+            var states = country.data().entries.toList();
+            states.sort((a, b) => a.key.compareTo(b.key));
+            for (var state in states) {
+              censusStates.add(CensusState(state.key, state.value));
+              censusCountry += state.value as int;
             }
-            worldChangeNotifier?.endAddingResidents();
+            censusCountries
+                .add(CensusCountry(country.id, censusCountry, censusStates));
+            notifyListeners();
           }
         });
       } else {
         _userSubscription?.cancel();
-        _usersSubscription?.cancel();
+        _censusSubscription?.cancel();
         _userSubscription = null;
-        _usersSubscription = null;
+        _censusSubscription = null;
       }
     });
   }
@@ -213,6 +218,7 @@ class FirebaseChangeNotifier extends ChangeNotifier {
           .collection('users')
           .doc(_userId)
           .delete();
+      await updateCensus(_country, _state, -1);
       _message = "Your data has been deleted.";
       notifyListeners();
     } on FirebaseAuthException catch (e) {
@@ -231,8 +237,10 @@ class FirebaseChangeNotifier extends ChangeNotifier {
     }
   }
 
-  void setCountryState(String country, String state) {
+  Future<void> setCountryState(String country, String state) async {
     if (isSignedIn) {
+      await updateCensus(_country, _state, -1);
+      await updateCensus(country, state, 1);
       FirebaseFirestore.instance
           .collection('users')
           .doc(_userId)
@@ -243,9 +251,63 @@ class FirebaseChangeNotifier extends ChangeNotifier {
     }
   }
 
+  Future<void> updateCensus(String country, String state, int delta) async {
+    if (country.isEmpty || state.isEmpty) {
+      return;
+    }
+
+    var documentReference =
+        FirebaseFirestore.instance.collection('census').doc(country);
+
+    await FirebaseFirestore.instance.runTransaction((transaction) async {
+      int oldEntries = 0;
+      bool oldCensusExists = false;
+      int oldCensus = 0;
+      try {
+        var before = await transaction.get(documentReference);
+        if (before.exists) {
+          var data = before.data();
+          if (data != null) {
+            oldEntries = data.entries.length;
+            oldCensusExists = data.containsKey(state);
+            if (oldCensusExists) {
+              oldCensus = data[state];
+            }
+          }
+        }
+      } catch (e) {
+        ;
+      }
+
+      var newCensus = oldCensus + delta;
+
+      if (oldEntries == 1 && oldCensusExists && newCensus <= 0) {
+        transaction.delete(documentReference);
+      } else {
+        transaction.set(
+            documentReference,
+            {state: (newCensus > 0) ? newCensus : FieldValue.delete()},
+            SetOptions(merge: true));
+      }
+    });
+  }
+
   String _country = "";
   String get country => _country;
 
   String _state = "";
   String get state => _state;
+}
+
+class CensusCountry {
+  final String name;
+  final int census;
+  final List<CensusState> states;
+  CensusCountry(this.name, this.census, this.states);
+}
+
+class CensusState {
+  final String name;
+  final int census;
+  CensusState(this.name, this.census);
 }

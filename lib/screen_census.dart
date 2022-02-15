@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:local_pavoni/firebase_cnp.dart';
 import 'package:provider/provider.dart';
 import 'main.dart';
-import 'world_cnp.dart';
+import 'firebase_cnp.dart';
 
 class CensusScreen extends StatelessWidget {
   const CensusScreen({Key? key}) : super(key: key);
@@ -24,15 +25,13 @@ class CensusBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<WorldChangeNotifier>(
-        builder: (context, worldChangeNotifier, child) {
-      var countries = worldChangeNotifier.worldCensus().toList();
+    return Consumer<FirebaseChangeNotifier>(
+        builder: (context, firebaseChangeNotifier, child) {
+      var countries = firebaseChangeNotifier.censusCountries;
       return ListView.builder(
           itemCount: countries.length,
           itemBuilder: (context, index) {
             var country = countries[index];
-            var states =
-                worldChangeNotifier.countryCensus(country.name).toList();
             return Column(
               children: [
                 Padding(
@@ -51,9 +50,9 @@ class CensusBody extends StatelessWidget {
                     shrinkWrap: true, // needed to nest ListViews
                     physics:
                         const ClampingScrollPhysics(), // needed to nest ListViews
-                    itemCount: states.length,
+                    itemCount: country.states.length,
                     itemBuilder: (context, index) {
-                      var state = states[index];
+                      var state = country.states[index];
                       return Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Row(
