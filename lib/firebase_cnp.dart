@@ -39,11 +39,18 @@ class FirebaseChangeNotifier extends ChangeNotifier {
 
   WorldChangeNotifier? worldChangeNotifier;
 
+  FacebookAuthProvider facebookProvider = FacebookAuthProvider();
+
   FirebaseChangeNotifier() {
     init();
   }
 
   Future<void> init() async {
+    facebookProvider.addScope('email');
+    facebookProvider.setCustomParameters({
+      'display': 'popup',
+    });
+
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
@@ -136,6 +143,17 @@ class FirebaseChangeNotifier extends ChangeNotifier {
     }
   }
 
+  Future<void> signInFacebook() async {
+    try {
+      _message = null;
+      notifyListeners();
+      await FirebaseAuth.instance.signInWithPopup(facebookProvider);
+    } on FirebaseAuthException catch (e) {
+      _message = e.message;
+      notifyListeners();
+    }
+  }
+
   Future<void> register(
     String password,
   ) async {
@@ -153,7 +171,7 @@ class FirebaseChangeNotifier extends ChangeNotifier {
   Future<void> veryifyEmail() async {
     try {
       await _user?.sendEmailVerification();
-      _authenticationState = AuthenticationStateEnum.needEmail;
+      //_authenticationState = AuthenticationStateEnum.needEmail;
       _message = "Check your email to verify your account.";
       notifyListeners();
     } on FirebaseAuthException catch (e) {
@@ -165,7 +183,7 @@ class FirebaseChangeNotifier extends ChangeNotifier {
   Future<void> resetPassword() async {
     try {
       await FirebaseAuth.instance.sendPasswordResetEmail(email: _email);
-      _authenticationState = AuthenticationStateEnum.needEmail;
+      //_authenticationState = AuthenticationStateEnum.needEmail;
       _message = "Check your email to reset your password.";
       notifyListeners();
     } on FirebaseAuthException catch (e) {
@@ -190,6 +208,18 @@ class FirebaseChangeNotifier extends ChangeNotifier {
   }
 
   Future<void> deleteUser() async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(_userId)
+          .delete();
+      _message = "Your data has been deleted.";
+      notifyListeners();
+    } on FirebaseAuthException catch (e) {
+      _message = e.message;
+      notifyListeners();
+    }
+
     try {
       await _user?.delete();
       _authenticationState = AuthenticationStateEnum.needEmail;

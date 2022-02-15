@@ -34,6 +34,19 @@ class _FirebaseAuthenticationWidgetState
           children: <Widget>[
             if (authenticationChangeNotifier.authenticationState ==
                 AuthenticationStateEnum.needEmail) ...[
+              ElevatedButton(
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    authenticationChangeNotifier.signInFacebook();
+                  }
+                },
+                child: const Text("Login with Facebook"),
+              ),
+              Container(height: 8),
+              const Divider(),
+            ],
+            if (authenticationChangeNotifier.authenticationState ==
+                AuthenticationStateEnum.needEmail) ...[
               SizedBox(
                 width: 400,
                 child: TextFormField(
@@ -81,10 +94,6 @@ class _FirebaseAuthenticationWidgetState
                 ),
               ),
             ],
-            if (authenticationChangeNotifier.message != null) ...[
-              Container(height: 8),
-              Text(authenticationChangeNotifier.message.toString()),
-            ],
             Container(height: 8),
             Wrap(
               spacing: 8,
@@ -98,7 +107,7 @@ class _FirebaseAuthenticationWidgetState
                             .checkEmail(_emailController.text);
                       }
                     },
-                    child: const Text("Continue Login / Registration"),
+                    child: const Text("Login/Register with Email"),
                   ),
                 ],
                 if (authenticationChangeNotifier.authenticationState ==
@@ -185,6 +194,12 @@ class _FirebaseAuthenticationWidgetState
                 ],
               ],
             ),
+            Container(height: 8),
+            const Divider(),
+            if (authenticationChangeNotifier.message != null) ...[
+              Container(height: 8),
+              Text(authenticationChangeNotifier.message.toString()),
+            ],
           ],
         ),
       );

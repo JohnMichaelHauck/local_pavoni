@@ -38,7 +38,7 @@ class SigninBody extends StatelessWidget {
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.headline5),
         Padding(
-            padding: const EdgeInsets.all(12.0),
+            padding: const EdgeInsets.all(16.0),
             child: FirebaseAuthenticationWidget(key: key)),
       ],
     );
