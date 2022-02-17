@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -218,7 +217,6 @@ class FirebaseChangeNotifier extends ChangeNotifier {
           .collection('users')
           .doc(_userId)
           .delete();
-      await updateCensus(_country, _state, -1);
       _message = "Your data has been deleted.";
       notifyListeners();
     } on FirebaseAuthException catch (e) {
@@ -239,8 +237,6 @@ class FirebaseChangeNotifier extends ChangeNotifier {
 
   Future<void> setCountryState(String country, String state) async {
     if (isSignedIn) {
-      await updateCensus(_country, _state, -1);
-      await updateCensus(country, state, 1);
       FirebaseFirestore.instance
           .collection('users')
           .doc(_userId)
@@ -249,47 +245,6 @@ class FirebaseChangeNotifier extends ChangeNotifier {
         'state': state,
       }, SetOptions(merge: true));
     }
-  }
-
-  Future<void> updateCensus(String country, String state, int delta) async {
-    if (country.isEmpty || state.isEmpty) {
-      return;
-    }
-
-    var documentReference =
-        FirebaseFirestore.instance.collection('census').doc(country);
-
-    await FirebaseFirestore.instance.runTransaction((transaction) async {
-      int oldEntries = 0;
-      bool oldCensusExists = false;
-      int oldCensus = 0;
-      try {
-        var before = await transaction.get(documentReference);
-        if (before.exists) {
-          var data = before.data();
-          if (data != null) {
-            oldEntries = data.entries.length;
-            oldCensusExists = data.containsKey(state);
-            if (oldCensusExists) {
-              oldCensus = data[state];
-            }
-          }
-        }
-      } catch (e) {
-        ;
-      }
-
-      var newCensus = oldCensus + delta;
-
-      if (oldEntries == 1 && oldCensusExists && newCensus <= 0) {
-        transaction.delete(documentReference);
-      } else {
-        transaction.set(
-            documentReference,
-            {state: (newCensus > 0) ? newCensus : FieldValue.delete()},
-            SetOptions(merge: true));
-      }
-    });
   }
 
   String _country = "";
