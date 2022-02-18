@@ -33,15 +33,8 @@ void main() async {
       ChangeNotifierProvider(
         create: (context) => WorldChangeNotifier(),
       ),
-      ChangeNotifierProxyProvider<WorldChangeNotifier, FirebaseChangeNotifier>(
+      ChangeNotifierProvider(
         create: (context) => FirebaseChangeNotifier(),
-        update: (context, worldChangeNotifier, firebaseChangeNotifier) {
-          if (firebaseChangeNotifier == null) {
-            throw ArgumentError.notNull('firebaseChangeNotifier');
-          }
-          firebaseChangeNotifier.worldChangeNotifier = worldChangeNotifier;
-          return firebaseChangeNotifier;
-        },
       ),
     ],
     child: const App(),

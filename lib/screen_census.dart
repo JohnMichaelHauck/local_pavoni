@@ -27,6 +27,10 @@ class CensusBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<FirebaseChangeNotifier>(
         builder: (context, firebaseChangeNotifier, child) {
+      if (!firebaseChangeNotifier.isSignedIn) {
+        return Container();
+      }
+
       var countries = firebaseChangeNotifier.censusCountries;
       return ListView.builder(
           itemCount: countries.length,

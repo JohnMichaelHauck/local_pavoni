@@ -3,7 +3,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'world_cnp.dart';
 import 'firebase_options.dart';
 
 enum AuthenticationStateEnum {
@@ -36,8 +35,6 @@ class FirebaseChangeNotifier extends ChangeNotifier {
   StreamSubscription<DocumentSnapshot>? _userSubscription;
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _censusSubscription;
   List<CensusCountry> censusCountries = [];
-
-  WorldChangeNotifier? worldChangeNotifier;
 
   FacebookAuthProvider facebookProvider = FacebookAuthProvider();
 
@@ -103,8 +100,8 @@ class FirebaseChangeNotifier extends ChangeNotifier {
             }
             censusCountries
                 .add(CensusCountry(country.id, censusCountry, censusStates));
-            notifyListeners();
           }
+          notifyListeners();
         });
       } else {
         _userSubscription?.cancel();

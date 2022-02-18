@@ -27,63 +27,63 @@ class MeBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer2<FirebaseChangeNotifier, WorldChangeNotifier>(
         builder: (context, firebaseChangeNotifier, worldChangeNotifier, child) {
-      return firebaseChangeNotifier.isSignedIn
-          ? ListView(
+      if (!firebaseChangeNotifier.isSignedIn) {
+        return Container();
+      }
+
+      return ListView(
+        children: [
+          Container(height: 16),
+          GestureDetector(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Container(height: 16),
-                GestureDetector(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.language),
-                      Container(width: 8),
-                      Text(firebaseChangeNotifier.country,
-                          textAlign: TextAlign.center),
-                      Container(width: 8),
-                      const Icon(Icons.arrow_downward),
-                    ],
-                  ),
-                  behavior: HitTestBehavior.opaque,
-                  onTap: () async {
-                    var country = await _countryOrStateDialog(
-                        context, worldChangeNotifier.countries());
-                    if (country != null) {
-                      firebaseChangeNotifier.setCountryState(
-                          country, worldChangeNotifier.states(country)[0]);
-                    }
-                  },
-                ),
-                Container(height: 16),
-                GestureDetector(
-                  child: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.location_pin),
-                        Container(width: 8),
-                        Text(firebaseChangeNotifier.state,
-                            textAlign: TextAlign.center),
-                        Container(width: 8),
-                        const Icon(Icons.arrow_downward),
-                      ],
-                    ),
-                  ),
-                  behavior: HitTestBehavior.opaque,
-                  onTap: () async {
-                    var state = await _countryOrStateDialog(
-                        context,
-                        worldChangeNotifier
-                            .states(firebaseChangeNotifier.country));
-                    if (state != null) {
-                      firebaseChangeNotifier.setCountryState(
-                          firebaseChangeNotifier.country, state);
-                    }
-                  },
-                ),
+                const Icon(Icons.language),
+                Container(width: 8),
+                Text(firebaseChangeNotifier.country,
+                    textAlign: TextAlign.center),
+                Container(width: 8),
+                const Icon(Icons.arrow_downward),
               ],
-            )
-          : Container();
+            ),
+            behavior: HitTestBehavior.opaque,
+            onTap: () async {
+              var country = await _countryOrStateDialog(
+                  context, worldChangeNotifier.countries());
+              if (country != null) {
+                firebaseChangeNotifier.setCountryState(
+                    country, worldChangeNotifier.states(country)[0]);
+              }
+            },
+          ),
+          Container(height: 16),
+          GestureDetector(
+            child: Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.location_pin),
+                  Container(width: 8),
+                  Text(firebaseChangeNotifier.state,
+                      textAlign: TextAlign.center),
+                  Container(width: 8),
+                  const Icon(Icons.arrow_downward),
+                ],
+              ),
+            ),
+            behavior: HitTestBehavior.opaque,
+            onTap: () async {
+              var state = await _countryOrStateDialog(context,
+                  worldChangeNotifier.states(firebaseChangeNotifier.country));
+              if (state != null) {
+                firebaseChangeNotifier.setCountryState(
+                    firebaseChangeNotifier.country, state);
+              }
+            },
+          ),
+        ],
+      );
     });
   }
 
