@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:local_pavoni/firebase_cnp.dart';
+import 'package:local_pavoni/cn_firebase.dart';
 import 'package:provider/provider.dart';
 import 'main.dart';
-import 'firebase_cnp.dart';
+import 'cn_firebase.dart';
 
 class CensusScreen extends StatelessWidget {
   const CensusScreen({Key? key}) : super(key: key);

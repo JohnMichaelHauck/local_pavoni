@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'firebase_cnp.dart';
+import 'cn_firebase.dart';
 
 class FirebaseAuthenticationWidget extends StatefulWidget {
   const FirebaseAuthenticationWidget({Key? key}) : super(key: key);

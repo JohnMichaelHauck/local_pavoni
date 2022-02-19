@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'firebase_cnp.dart';
+import 'cn_firebase.dart';
 import 'main.dart';
-import 'world_cnp.dart';
+import 'cn_world.dart';
 
 class MeScreen extends StatelessWidget {
   const MeScreen({Key? key}) : super(key: key);
