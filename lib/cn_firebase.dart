@@ -30,6 +30,7 @@ class FirebaseChangeNotifier extends ChangeNotifier {
   AuthenticationStateEnum get authenticationState => _authenticationState;
 
   bool get isSignedIn =>
+      _authenticationState == AuthenticationStateEnum.needEmailVerification ||
       _authenticationState == AuthenticationStateEnum.signedIn;
 
   StreamSubscription<DocumentSnapshot>? _userSubscription;
